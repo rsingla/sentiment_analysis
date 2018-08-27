@@ -2,15 +2,14 @@ import nltk
 
 from nltk.tokenize import sent_tokenize, word_tokenize
 
-list_play_files = ["../nltk_sentiment_analysis/julius_caesar",
-                    "../nltk_sentiment_analysis/macbeth", "../nltk_sentiment_analysis/merchantofvenice",
-                   "../nltk_sentiment_analysis/romeoandjuliet", "../nltk_sentiment_analysis/tempest"]
+base_path = "../nltk_sentiment_analysis/resources/"
+
+list_play_files = ['julius_caesar',"macbeth", "merchantofvenice","romeoandjuliet", "tempest"]
 
 word_dict = {}
 
-for filepath in list_play_files:
-    file = open(filepath,"r")
-    count = 0
+for playname in list_play_files:
+    file = open(base_path+playname,"r")
     name = file.name
     completeLine = []
     for line in file:
