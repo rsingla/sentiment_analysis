@@ -20,35 +20,42 @@ def parse_play_data(play_list):
         path = base_path+play_name
         file = open(path,"r")
 
-        #custom_tokenizer = PunktSentenceTokenizer()
-
         for line in file:
             if len(line) > 0:
                 tokens = tokens + wordpunct_tokenize(line)
         file.close()
 
-        lemmatized_list = apply_lemmatizer(tokens)
-        pre_processed_list = clean_out_punct(lemmatized_list)
+        #lemmatized_list = apply_lemmatizer(tokens)
+        pre_processed_list = clean_out_punct(tokens)
         stop_wrd_cleaned_list = remove_stop_words(pre_processed_list)
 
-        final_list = create_tagged_and_chunk_list(stop_wrd_cleaned_list)
+        word_dict[play_name] = stop_wrd_cleaned_list
 
-        word_dict[play_name] = final_list
+        stop_words = set(stopwords.words("english"))
+
+        sun_bigrams = [b for b in nltk.bigrams(pre_processed_list) if (b[0] == 'sun' or b[1] == 'sun')
+                       and b[0] not in stop_words and b[1] not in stop_words]
+
+        print(sun_bigrams)
+        tagged_list = create_tagged_list(stop_wrd_cleaned_list)
+        name_entity_tagged_list(tagged_list)
 
     return word_dict
 
-def create_tagged_and_chunk_list(tokens):
+def name_entity_tagged_list(tagged_list):
+    chunk = tagged_list[0:30]
+    print(chunk)
+    named_entity = nltk.ne_chunk(chunk, binary=True)
+    named_entity.draw()
+
+
+
+def create_tagged_list(tokens):
     list_tagged_wrds = []
     for token in tokens:
         tagged_tokens = word_tokenize(token)
         tagged = nltk.pos_tag(tagged_tokens)
         list_tagged_wrds = list_tagged_wrds + tagged
-
-    #chunk_gram = r"""Chunk: {<RB.?><VB.?><NNP.?><NN.?>?}"""
-    #chunk_parser = nltk.RegexpParser(chunk_gram)
-    #chunked = chunk_parser.parse(list_tagged_wrds[0:300])
-
-    #chunked.draw()
 
     return list_tagged_wrds
 
@@ -96,6 +103,7 @@ def printfile(word_dict):
         print(key)
         print(value)
         freq = nltk.FreqDist(value)
+        print(freq.most_common(10))
         freq.plot(20, cumulative=False, title=key)
 
 
